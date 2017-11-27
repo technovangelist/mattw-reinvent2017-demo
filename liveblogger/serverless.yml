@@ -1,0 +1,108 @@
+service: 
+  name: mattw-reinvent2017-liveblogger
+
+plugins:
+  - serverless-webpack
+  - serverless-pseudo-parameters
+  - serverless-step-functions
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource:
+        - arn:aws:s3:::mattw-reinvent17-liveblogger-src/*
+    - Effect: "Allow"
+      Action:
+        - "states:StartExecution"
+      Resource: 
+        - ${self:resources.Outputs.LiveBloggerStateMachine.Value}
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:GetItem"
+      Resource:
+        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/liveblogger
+functions:
+  uploadToS3:
+    handler: handler.uploadToS3
+    events:
+      - http:
+          path: upload
+          method: PUT
+          cors: true
+    environment:
+      s3srcbucket: mattw-reinvent17-liveblogger-src
+
+  startStepFunction:
+    handler: handler.startStepFunction
+    events: 
+      - s3: 
+          bucket: mattw-reinvent17-liveblogger-src
+          event: s3:ObjectCreated:*
+    environment: 
+      statemachine_arn: ${self:resources.Outputs.LiveBloggerStateMachine.Value}
+  whichSlide:
+    handler: handler.whichSlide
+  isThisANewSlide:
+    handler: handler.isThisANewSlide
+  pullSlideData:
+    handler: handler.pullSlideData
+  createDocument:
+    handler: handler.createDocument
+
+stepFunctions:
+  stateMachines:
+    LiveBloggerStateMachine:
+      name: liveBloggerStateMachine
+      definition:
+        StartAt: whichSlide
+        States:
+          whichSlide:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-whichSlide
+            Next: isThisANewSlide
+          isThisANewSlide:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-isThisANewSlide
+            Next: updateSiteOrNot
+          updateSiteOrNot:
+            Type: Choice
+            Choices:
+              - Variable: "$.updateSite"
+                BooleanEquals: true
+                Next: pullSlideData
+              - Variable: "$.updateSite"
+                BooleanEquals: false
+                Next: completeSF
+          pullSlideData:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-pullSlideData
+            Next: createDocument
+          createDocument:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-createDocument
+            Next: completeSF
+          completeSF:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-complete
+            End: true
+          
+
+resources:
+  # Resources:
+  #   S3BucketSrcPhotos:
+  #     Type: AWS::S3::Bucket
+  #     Properties:
+  #       BucketName: mattw-reinvent17-liveblogger-src
+  Outputs:
+    LiveBloggerStateMachine:
+      Description: The ARN of the example state machine
+      Value:
+        Ref: LiveBloggerStateMachine
+
+         

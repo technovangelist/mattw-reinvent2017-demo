@@ -1,0 +1,594 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket"
+    },
+    "BuildSiteLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-build-website-dev-buildSite"
+      }
+    },
+    "WhatChangedLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-build-website-dev-whatChanged"
+      }
+    },
+    "BuildDockerLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-build-website-dev-buildDocker"
+      }
+    },
+    "IsTheContainerBuiltLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-build-website-dev-isTheContainerBuilt"
+      }
+    },
+    "IsItBuiltLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-build-website-dev-isItBuilt"
+      }
+    },
+    "DoneLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-build-website-dev-done"
+      }
+    },
+    "StartStepFunctionLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-build-website-dev-startStepFunction"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "dev",
+                  "mattw-reinvent2017-build-website",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-buildSite:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-whatChanged:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-buildDocker:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-isTheContainerBuilt:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-isItBuilt:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-done:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-startStepFunction:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-buildSite:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-whatChanged:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-buildDocker:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-isTheContainerBuilt:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-isItBuilt:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-done:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-build-website-dev-startStepFunction:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:StartExecution"
+                  ],
+                  "Resource": [
+                    {
+                      "Ref": "MyStateMachine"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "codecommit:GetCommit",
+                    "codecommit:GetDifferences"
+                  ],
+                  "Resource": [
+                    "arn:aws:codecommit:us-east-1:#{AWS::AccountId}:reinvent2017-website"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "codebuild:BatchGetBuilds"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sns:Publish"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "mattw-reinvent2017-build-website",
+              "dev",
+              "us-east-1",
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "BuildSiteLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1510594344335-2017-11-13T17:32:24.335Z/mattw-reinvent2017-build-website.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-build-website-dev-buildSite",
+        "Handler": "handler.build",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "BuildSiteLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "BuildSiteLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "BuildSiteLambdaFunction"
+        },
+        "CodeSha256": "RNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY="
+      }
+    },
+    "WhatChangedLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1510594344335-2017-11-13T17:32:24.335Z/mattw-reinvent2017-build-website.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-build-website-dev-whatChanged",
+        "Handler": "handler.whatChanged",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "WhatChangedLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "WhatChangedLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "WhatChangedLambdaFunction"
+        },
+        "CodeSha256": "RNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY="
+      }
+    },
+    "BuildDockerLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1510594344335-2017-11-13T17:32:24.335Z/mattw-reinvent2017-build-website.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-build-website-dev-buildDocker",
+        "Handler": "handler.buildDocker",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "BuildDockerLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "BuildDockerLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "BuildDockerLambdaFunction"
+        },
+        "CodeSha256": "RNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY="
+      }
+    },
+    "IsTheContainerBuiltLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1510594344335-2017-11-13T17:32:24.335Z/mattw-reinvent2017-build-website.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-build-website-dev-isTheContainerBuilt",
+        "Handler": "handler.isTheContainerBuilt",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "IsTheContainerBuiltLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "IsTheContainerBuiltLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "IsTheContainerBuiltLambdaFunction"
+        },
+        "CodeSha256": "RNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY="
+      }
+    },
+    "IsItBuiltLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1510594344335-2017-11-13T17:32:24.335Z/mattw-reinvent2017-build-website.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-build-website-dev-isItBuilt",
+        "Handler": "handler.isItBuilt",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "IsItBuiltLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "IsItBuiltLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "IsItBuiltLambdaFunction"
+        },
+        "CodeSha256": "RNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY="
+      }
+    },
+    "DoneLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1510594344335-2017-11-13T17:32:24.335Z/mattw-reinvent2017-build-website.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-build-website-dev-done",
+        "Handler": "handler.done",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "DoneLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "DoneLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "DoneLambdaFunction"
+        },
+        "CodeSha256": "RNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY="
+      }
+    },
+    "StartStepFunctionLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1510594344335-2017-11-13T17:32:24.335Z/mattw-reinvent2017-build-website.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-build-website-dev-startStepFunction",
+        "Handler": "handler.startStepFunction",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "statemachine_arn": {
+              "Ref": "MyStateMachine"
+            }
+          }
+        }
+      },
+      "DependsOn": [
+        "StartStepFunctionLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "StartStepFunctionLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "StartStepFunctionLambdaFunction"
+        },
+        "CodeSha256": "RNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY="
+      }
+    },
+    "IamRoleStateMachineExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "states.us-east-1.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "dev-us-east-1-mattw-reinvent2017-build-website-statemachine",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "MyStateMachine": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "DefinitionString": "{\"StartAt\":\"WhatChanged\",\"States\":{\"WhatChanged\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-whatChanged\",\"Next\":\"BuildDockerOrNot\"},\"BuildDockerOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.hasDocker\",\"BooleanEquals\":true,\"Next\":\"BuildDocker\"},{\"Variable\":\"$.hasDocker\",\"BooleanEquals\":false,\"Next\":\"BuildSite\"}]},\"BuildDocker\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-buildDocker\",\"Next\":\"WaitForDockerBuild\"},\"WaitForDockerBuild\":{\"Type\":\"Wait\",\"Seconds\":20,\"Next\":\"IsTheContainerBuilt\"},\"IsTheContainerBuilt\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-isTheContainerBuilt\",\"Next\":\"ContainerBuiltOrNot\"},\"ContainerBuiltOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.containerBuildDone\",\"BooleanEquals\":true,\"Next\":\"BuildSite\"},{\"Variable\":\"$.containerBuildDone\",\"BooleanEquals\":true,\"Next\":\"WaitForDockerBuild\"}]},\"BuildSite\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-buildSite\",\"Next\":\"WaitForBuild\"},\"WaitForBuild\":{\"Type\":\"Wait\",\"Seconds\":5,\"Next\":\"IsItBuilt\"},\"IsItBuilt\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-isItBuilt\",\"Next\":\"BuiltOrNot\"},\"BuiltOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.buildDone\",\"BooleanEquals\":true,\"Next\":\"Done\"},{\"Variable\":\"$.buildDone\",\"BooleanEquals\":false,\"Next\":\"WaitForBuild\"}]},\"Done\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-done\",\"End\":true}}}",
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "IamRoleStateMachineExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": "IamRoleStateMachineExecution"
+    },
+    "StartStepFunctionSnsSubscriptionMattwreinventwebsitebuild": {
+      "Type": "AWS::SNS::Subscription",
+      "Properties": {
+        "TopicArn": "arn:aws:sns:us-east-1:#{AWS::AccountId}:mattw-reinvent-websitebuild",
+        "Protocol": "lambda",
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "StartStepFunctionLambdaFunction",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "StartStepFunctionLambdaPermissionMattwreinventwebsitebuildSNS": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "StartStepFunctionLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "sns.amazonaws.com",
+        "SourceArn": "arn:aws:sns:us-east-1:#{AWS::AccountId}:mattw-reinvent-websitebuild"
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      }
+    },
+    "BuildSiteLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "BuildSiteLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY"
+      }
+    },
+    "WhatChangedLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "WhatChangedLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY"
+      }
+    },
+    "BuildDockerLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "BuildDockerLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY"
+      }
+    },
+    "IsTheContainerBuiltLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "IsTheContainerBuiltLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY"
+      }
+    },
+    "IsItBuiltLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "IsItBuiltLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY"
+      }
+    },
+    "DoneLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "DoneLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY"
+      }
+    },
+    "StartStepFunctionLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "StartStepFunctionLambdaVersionRNx96bzjKG2nTuHyB0eNcfUqhlVIydcqiT2IZoSpaEY"
+      }
+    },
+    "MyStateMachineArn": {
+      "Description": "Current StateMachine Arn",
+      "Value": {
+        "Ref": "MyStateMachine"
+      }
+    },
+    "MyStateMachine": {
+      "Description": "The ARN of the example state machine",
+      "Value": {
+        "Ref": "MyStateMachine"
+      }
+    }
+  }
+}

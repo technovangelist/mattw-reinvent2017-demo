@@ -1,0 +1,137 @@
+service:
+  name: mattw-reinvent2017-build-website
+
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-step-functions
+  - serverless-webpack
+custom:
+  repoName: reinvent2017-website
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "states:StartExecution"
+      Resource: 
+        - ${self:resources.Outputs.MyStateMachine.Value}
+    - Effect: "Allow"
+      Action:
+        - "codecommit:GetCommit"
+        - "codecommit:GetDifferences"
+      Resource: 
+        - arn:aws:codecommit:${self:provider.region}:#{AWS::AccountId}:${self:custom.repoName}
+    - Effect: "Allow"
+      Action:
+        - "codebuild:BatchGetBuilds"
+      Resource:
+        - "*"
+    - Effect: "Allow"
+      Action:
+        - "sns:Publish"
+      Resource:
+        - "*"
+
+
+functions:
+  buildSite:
+    handler: handler.build
+  whatChanged:
+    handler: handler.whatChanged
+  buildDocker:
+    handler: handler.buildDocker
+  isTheContainerBuilt:
+    handler: handler.isTheContainerBuilt
+  isItBuilt:
+    handler: handler.isItBuilt
+  done:
+    handler: handler.done
+  startStepFunction:
+    handler: handler.startStepFunction
+    events:
+      - sns: arn:aws:sns:${self:provider.region}:#{AWS::AccountId}:mattw-reinvent-websitebuild
+    environment: 
+      statemachine_arn: ${self:resources.Outputs.MyStateMachine.Value}
+      # ${self:service}-${self:provider.stage}-FirstStateMachine
+
+stepFunctions:
+  stateMachines:
+    FirstStateMachine:
+      name: myStateMachine
+      definition:
+        StartAt: WhatChanged
+        States:
+          WhatChanged:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-whatChanged
+            Next: BuildDockerOrNot
+          BuildDockerOrNot:
+            Type: Choice
+            Choices:
+              - Variable: "$.hasDocker"
+                BooleanEquals: true
+                Next: BuildDocker
+              - Variable: "$.hasDocker"
+                BooleanEquals: false
+                Next: BuildSite
+          BuildDocker:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-buildDocker
+            Next: WaitForDockerBuild
+          WaitForDockerBuild:
+            Type: Wait
+            Seconds: 20
+            Next: IsTheContainerBuilt
+          IsTheContainerBuilt:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-isTheContainerBuilt
+            Next: ContainerBuiltOrNot
+          ContainerBuiltOrNot:
+            Type: Choice
+            Choices:
+              - Variable: "$.containerBuildDone"
+                BooleanEquals: True
+                Next: BuildSite
+              - Variable: "$.containerBuildDone"
+                BooleanEquals: True
+                Next: WaitForDockerBuild
+          BuildSite:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-buildSite
+            Next: WaitForBuild
+          WaitForBuild:
+            Type: Wait
+            Seconds: 10
+            Next: IsItBuilt
+          IsItBuilt:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-isItBuilt
+            Next: BuiltOrNot
+          BuiltOrNot:
+            Type: Choice
+            Choices: 
+              - Variable: "$.buildDone"
+                BooleanEquals: true
+                Next: Done
+              - Variable: "$.buildDone"
+                BooleanEquals: false
+                Next: WaitForBuild
+          Done:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-done
+            End: True
+
+            
+
+resources:
+  Outputs:
+    MyStateMachine:
+      Description: The ARN of the example state machine
+      Value:
+        Ref: MyStateMachine
+
+ 

@@ -1,0 +1,32 @@
+{
+  "name": "sitebuilderjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.141.0"
+  },
+  "devDependencies": {
+    "@types/babel-core": "^6.25.3",
+    "@types/webpack": "^3.8.1",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "serverless-cf-vars": "^0.1.0",
+    "serverless-pseudo-parameters": "^1.2.5",
+    "serverless-step-functions": "^1.2.0",
+    "serverless-webpack": "^4.0.0",
+    "webpack": "^3.8.1"
+  }
+}

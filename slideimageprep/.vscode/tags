@@ -1,0 +1,23 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ImageTransformer	../image_transformer.py	/^class ImageTransformer(object):$/;"	kind:class	line:28
+__init__	../image_transformer.py	/^    def __init__(self, image_path, shape):$/;"	kind:member	line:32
+cv2	../image_transformer.py	/^import cv2$/;"	kind:namespace	line:3
+cv2	../util.py	/^import cv2$/;"	kind:namespace	line:2
+deg_to_rad	../util.py	/^def deg_to_rad(deg):$/;"	kind:function	line:26
+get_M	../image_transformer.py	/^    def get_M(self, theta, phi, gamma, dx, dy, dz):$/;"	kind:member	line:60
+get_deg	../util.py	/^def get_deg(rtheta, rphi, rgamma):$/;"	kind:function	line:21
+get_rad	../util.py	/^def get_rad(theta, phi, gamma):$/;"	kind:function	line:16
+image_transformer.py	../image_transformer.py	1;"	kind:file	line:1
+imageprep.py	../imageprep.py	1;"	kind:file	line:1
+load_image	../util.py	/^def load_image(img_path, shape=None):$/;"	kind:function	line:6
+np	../image_transformer.py	/^import numpy as np$/;"	kind:namespace	line:2
+pi	../util.py	/^from math import pi$/;"	kind:namespace	line:1
+rad_to_deg	../util.py	/^def rad_to_deg(rad):$/;"	kind:function	line:29
+rotate_along_axis	../image_transformer.py	/^    def rotate_along_axis(self, theta=0, phi=0, gamma=0, dx=0, dy=0, dz=0):$/;"	kind:member	line:42
+save_image	../util.py	/^def save_image(img_path, img):$/;"	kind:function	line:13
+util.py	../util.py	1;"	kind:file	line:1

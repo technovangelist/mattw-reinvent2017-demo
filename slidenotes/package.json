@@ -1,0 +1,16 @@
+{
+  "name": "slidenotes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "postslidenotes.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.156.0",
+    "mz": "^2.7.0"
+  }
+}
