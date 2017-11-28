@@ -56,7 +56,6 @@ functions:
       - sns: arn:aws:sns:${self:provider.region}:#{AWS::AccountId}:mattw-reinvent-websitebuild
     environment: 
       statemachine_arn: ${self:resources.Outputs.MyStateMachine.Value}
-      # ${self:service}-${self:provider.stage}-FirstStateMachine
 
 stepFunctions:
   stateMachines:
@@ -69,6 +68,13 @@ stepFunctions:
             Type: Task
             Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-whatChanged
             Next: BuildDockerOrNot
+            Retry : 
+            - ErrorEquals:
+              - Lambda.Unknown
+                States.ALL
+              IntervalSeconds: 3
+              MaxAttempts: 4
+              BackoffRate: 1
           BuildDockerOrNot:
             Type: Choice
             Choices:

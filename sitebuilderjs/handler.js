@@ -22,7 +22,6 @@ module.exports.whatChanged = async (event, context, callback) => {
       diffInfo.differences.filter(diff => {
         return diff.beforeBlob.path.match(/(Dockerfile|buildspec.yml|package.json)/);
       }).length > 0;
-    // const returnObj = { hasDocker: hasDocker, commitId: event.CommitId };
     callback(null, {
       message: `Verified Commit: ${hasDocker
         ? "Docker Updated"
@@ -31,7 +30,7 @@ module.exports.whatChanged = async (event, context, callback) => {
       commitId: event.CommitId
     });
   } catch (err) {
-    callback(err.message);
+    callback(err);
   }
 };
 

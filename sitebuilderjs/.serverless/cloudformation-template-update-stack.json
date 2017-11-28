@@ -203,7 +203,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511814894322-2017-11-27T20:34:54.322Z/mattw-reinvent2017-build-website.zip"
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511875760161-2017-11-28T13:29:20.161Z/mattw-reinvent2017-build-website.zip"
         },
         "FunctionName": "mattw-reinvent2017-build-website-dev-buildSite",
         "Handler": "handler.build",
@@ -222,14 +222,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "BuildSiteLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA": {
+    "BuildSiteLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "BuildSiteLambdaFunction"
         },
-        "CodeSha256": "XOp/cYY2iNxpJFhoYM7EwSXyjgfgdmMqEp/bNkCWGgA="
+        "CodeSha256": "nT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY="
       }
     },
     "WhatChangedLambdaFunction": {
@@ -239,7 +239,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511814894322-2017-11-27T20:34:54.322Z/mattw-reinvent2017-build-website.zip"
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511875760161-2017-11-28T13:29:20.161Z/mattw-reinvent2017-build-website.zip"
         },
         "FunctionName": "mattw-reinvent2017-build-website-dev-whatChanged",
         "Handler": "handler.whatChanged",
@@ -258,14 +258,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "WhatChangedLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA": {
+    "WhatChangedLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "WhatChangedLambdaFunction"
         },
-        "CodeSha256": "XOp/cYY2iNxpJFhoYM7EwSXyjgfgdmMqEp/bNkCWGgA="
+        "CodeSha256": "nT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY="
       }
     },
     "BuildDockerLambdaFunction": {
@@ -275,7 +275,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511814894322-2017-11-27T20:34:54.322Z/mattw-reinvent2017-build-website.zip"
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511875760161-2017-11-28T13:29:20.161Z/mattw-reinvent2017-build-website.zip"
         },
         "FunctionName": "mattw-reinvent2017-build-website-dev-buildDocker",
         "Handler": "handler.buildDocker",
@@ -294,14 +294,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "BuildDockerLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA": {
+    "BuildDockerLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "BuildDockerLambdaFunction"
         },
-        "CodeSha256": "XOp/cYY2iNxpJFhoYM7EwSXyjgfgdmMqEp/bNkCWGgA="
+        "CodeSha256": "nT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY="
       }
     },
     "IsTheContainerBuiltLambdaFunction": {
@@ -311,7 +311,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511814894322-2017-11-27T20:34:54.322Z/mattw-reinvent2017-build-website.zip"
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511875760161-2017-11-28T13:29:20.161Z/mattw-reinvent2017-build-website.zip"
         },
         "FunctionName": "mattw-reinvent2017-build-website-dev-isTheContainerBuilt",
         "Handler": "handler.isTheContainerBuilt",
@@ -330,14 +330,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "IsTheContainerBuiltLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA": {
+    "IsTheContainerBuiltLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "IsTheContainerBuiltLambdaFunction"
         },
-        "CodeSha256": "XOp/cYY2iNxpJFhoYM7EwSXyjgfgdmMqEp/bNkCWGgA="
+        "CodeSha256": "nT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY="
       }
     },
     "IsItBuiltLambdaFunction": {
@@ -347,7 +347,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511814894322-2017-11-27T20:34:54.322Z/mattw-reinvent2017-build-website.zip"
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511875760161-2017-11-28T13:29:20.161Z/mattw-reinvent2017-build-website.zip"
         },
         "FunctionName": "mattw-reinvent2017-build-website-dev-isItBuilt",
         "Handler": "handler.isItBuilt",
@@ -366,14 +366,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "IsItBuiltLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA": {
+    "IsItBuiltLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "IsItBuiltLambdaFunction"
         },
-        "CodeSha256": "XOp/cYY2iNxpJFhoYM7EwSXyjgfgdmMqEp/bNkCWGgA="
+        "CodeSha256": "nT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY="
       }
     },
     "DoneLambdaFunction": {
@@ -383,7 +383,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511814894322-2017-11-27T20:34:54.322Z/mattw-reinvent2017-build-website.zip"
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511875760161-2017-11-28T13:29:20.161Z/mattw-reinvent2017-build-website.zip"
         },
         "FunctionName": "mattw-reinvent2017-build-website-dev-done",
         "Handler": "handler.done",
@@ -402,14 +402,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "DoneLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA": {
+    "DoneLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "DoneLambdaFunction"
         },
-        "CodeSha256": "XOp/cYY2iNxpJFhoYM7EwSXyjgfgdmMqEp/bNkCWGgA="
+        "CodeSha256": "nT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY="
       }
     },
     "StartStepFunctionLambdaFunction": {
@@ -419,7 +419,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511814894322-2017-11-27T20:34:54.322Z/mattw-reinvent2017-build-website.zip"
+          "S3Key": "serverless/mattw-reinvent2017-build-website/dev/1511875760161-2017-11-28T13:29:20.161Z/mattw-reinvent2017-build-website.zip"
         },
         "FunctionName": "mattw-reinvent2017-build-website-dev-startStepFunction",
         "Handler": "handler.startStepFunction",
@@ -445,14 +445,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "StartStepFunctionLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA": {
+    "StartStepFunctionLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "StartStepFunctionLambdaFunction"
         },
-        "CodeSha256": "XOp/cYY2iNxpJFhoYM7EwSXyjgfgdmMqEp/bNkCWGgA="
+        "CodeSha256": "nT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY="
       }
     },
     "IamRoleStateMachineExecution": {
@@ -492,7 +492,7 @@
     "MyStateMachine": {
       "Type": "AWS::StepFunctions::StateMachine",
       "Properties": {
-        "DefinitionString": "{\"StartAt\":\"WhatChanged\",\"States\":{\"WhatChanged\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-whatChanged\",\"Next\":\"BuildDockerOrNot\"},\"BuildDockerOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.hasDocker\",\"BooleanEquals\":true,\"Next\":\"BuildDocker\"},{\"Variable\":\"$.hasDocker\",\"BooleanEquals\":false,\"Next\":\"BuildSite\"}]},\"BuildDocker\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-buildDocker\",\"Next\":\"WaitForDockerBuild\"},\"WaitForDockerBuild\":{\"Type\":\"Wait\",\"Seconds\":20,\"Next\":\"IsTheContainerBuilt\"},\"IsTheContainerBuilt\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-isTheContainerBuilt\",\"Next\":\"ContainerBuiltOrNot\"},\"ContainerBuiltOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.containerBuildDone\",\"BooleanEquals\":true,\"Next\":\"BuildSite\"},{\"Variable\":\"$.containerBuildDone\",\"BooleanEquals\":false,\"Next\":\"WaitForDockerBuild\"}]},\"BuildSite\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-buildSite\",\"Next\":\"WaitForBuild\"},\"WaitForBuild\":{\"Type\":\"Wait\",\"Seconds\":10,\"Next\":\"IsItBuilt\"},\"IsItBuilt\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-isItBuilt\",\"Next\":\"BuiltOrNot\"},\"BuiltOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.buildDone\",\"BooleanEquals\":true,\"Next\":\"Done\"},{\"Variable\":\"$.buildDone\",\"BooleanEquals\":false,\"Next\":\"WaitForBuild\"}]},\"Done\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-done\",\"End\":true}}}",
+        "DefinitionString": "{\"StartAt\":\"WhatChanged\",\"States\":{\"WhatChanged\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-whatChanged\",\"Next\":\"BuildDockerOrNot\",\"Retry\":[{\"ErrorEquals\":[\"Lambda.Unknown States.ALL\"],\"IntervalSeconds\":3,\"MaxAttempts\":4,\"BackoffRate\":1}]},\"BuildDockerOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.hasDocker\",\"BooleanEquals\":true,\"Next\":\"BuildDocker\"},{\"Variable\":\"$.hasDocker\",\"BooleanEquals\":false,\"Next\":\"BuildSite\"}]},\"BuildDocker\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-buildDocker\",\"Next\":\"WaitForDockerBuild\"},\"WaitForDockerBuild\":{\"Type\":\"Wait\",\"Seconds\":20,\"Next\":\"IsTheContainerBuilt\"},\"IsTheContainerBuilt\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-isTheContainerBuilt\",\"Next\":\"ContainerBuiltOrNot\"},\"ContainerBuiltOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.containerBuildDone\",\"BooleanEquals\":true,\"Next\":\"BuildSite\"},{\"Variable\":\"$.containerBuildDone\",\"BooleanEquals\":false,\"Next\":\"WaitForDockerBuild\"}]},\"BuildSite\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-buildSite\",\"Next\":\"WaitForBuild\"},\"WaitForBuild\":{\"Type\":\"Wait\",\"Seconds\":10,\"Next\":\"IsItBuilt\"},\"IsItBuilt\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-isItBuilt\",\"Next\":\"BuiltOrNot\"},\"BuiltOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.buildDone\",\"BooleanEquals\":true,\"Next\":\"Done\"},{\"Variable\":\"$.buildDone\",\"BooleanEquals\":false,\"Next\":\"WaitForBuild\"}]},\"Done\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-done\",\"End\":true}}}",
         "RoleArn": {
           "Fn::GetAtt": [
             "IamRoleStateMachineExecution",
@@ -539,43 +539,43 @@
     "BuildSiteLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "BuildSiteLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA"
+        "Ref": "BuildSiteLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY"
       }
     },
     "WhatChangedLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "WhatChangedLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA"
+        "Ref": "WhatChangedLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY"
       }
     },
     "BuildDockerLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "BuildDockerLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA"
+        "Ref": "BuildDockerLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY"
       }
     },
     "IsTheContainerBuiltLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "IsTheContainerBuiltLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA"
+        "Ref": "IsTheContainerBuiltLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY"
       }
     },
     "IsItBuiltLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "IsItBuiltLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA"
+        "Ref": "IsItBuiltLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY"
       }
     },
     "DoneLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "DoneLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA"
+        "Ref": "DoneLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY"
       }
     },
     "StartStepFunctionLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "StartStepFunctionLambdaVersionXOpcYY2iNxpJFhoYM7EwSXyjgfgdmMqEpbNkCWGgA"
+        "Ref": "StartStepFunctionLambdaVersionnT4UexyVXYaMqBFAv4AeT0jwbej95lAB7HXiabNALYY"
       }
     },
     "MyStateMachineArn": {
