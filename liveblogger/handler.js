@@ -131,17 +131,36 @@ module.exports.pullSlideData = async (event, context, callback) => {
 };
 
 module.exports.createDocument = async (event, context, callback) => {
-  require("lambda-git")();
-  const codecommit = new aws.CodeCommit();
-  let result = {};
-  execute(result, {shell: "echo `ls /tmp/`", logOutput:true}).then(result => {
-    context.done();
-  });
+  let { DateTime } = require('luxon');
+  const dynamo = new aws.DynamoDB();
+  const params = {
+    Key: {
+      "slideid": {
+        N: event.slide
+      }
+    }, 
+    TableName: "liveblogger"
+  };
+  dynamo.getItem(params, (err, data) => {
+    if (err) console.log(err);
+    else {
 
-  
-  const repo = "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/reinvent2017-website";
-  git().exec(()=> console.log('start pull')).clone(repo, (err, data) => {
-    console.log(data);
+      let slidepost = `---\ndate: ${DateTime.local().toISO()}\ntitle: Slide ${event.slide} Live Blog\ntype: liveblog\n---\n![Slide Image](${event.image})<br>${data.Item.text.S}`;
+      console.log(slidepost);
+      const buffer = new Buffer(slidepost);
+      const params = {
+        Body: buffer, 
+        Bucket: "mattw-reinvent2017-rawsitepages", 
+        Key: `${DateTime.local().toFormat("LL-dd-yy-T")}/index.md`
+      }
+      const s3 = new aws.S3();
+      s3.putObject(params, (err, data)=>{
+        if (err) callback(err);
+        else callback(null, {message: "it worked"});
+
+      });
+
+    }
   })
 };
 

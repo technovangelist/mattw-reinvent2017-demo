@@ -81,13 +81,13 @@ module.exports.isTheContainerBuilt = async (event, context, callback) => {
     const buildInfo = await cb.batchGetBuilds(params).promise();
     const buildDone = buildInfo.builds[0].buildComplete;
     callback(null, {
-      message: "The container has been built",
+      message: `The container has${buildDone?" ":" not "}been built`,
       containerBuildId: event.containerBuildId,
       containerBuildDone: buildDone, 
       commitId: event.commitId
     });
   } catch (err) {
-    callback(err.message);
+    callback(null, {message: err.message});
   }
 };
 

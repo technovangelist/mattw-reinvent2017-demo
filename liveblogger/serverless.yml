@@ -17,6 +17,7 @@ provider:
         - "s3:*"
       Resource:
         - arn:aws:s3:::mattw-reinvent17-liveblogger-src/*
+        - arn:aws:s3:::mattw-reinvent2017-rawsitepages/*
     - Effect: "Allow"
       Action:
         - "states:StartExecution"
@@ -86,10 +87,32 @@ stepFunctions:
           createDocument:
             Type: Task
             Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-createDocument
-            Next: completeSF
+            # Resource: arn:aws:states:#{AWS::Region}:#{AWS::AccountId}:activity:mattw-reinvent2017-createnewpageactivity
+            Next: buildSite
+          buildSite:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-buildSite
+            Next: waitForBuild
+          waitForBuild:
+            Type: Wait
+            Seconds: 10
+            Next: isItBuilt
+          isItBuilt:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-isItBuilt
+            Next: builtOrNot
+          builtOrNot:
+            Type: Choice
+            Choices: 
+              - Variable: "$.buildDone"
+                BooleanEquals: true
+                Next: completeSF
+              - Variable: "$.buildDone"
+                BooleanEquals: false
+                Next: waitForBuild
           completeSF:
             Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-complete
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-done
             End: true
           
 

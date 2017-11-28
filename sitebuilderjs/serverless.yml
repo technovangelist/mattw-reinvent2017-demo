@@ -94,10 +94,10 @@ stepFunctions:
             Type: Choice
             Choices:
               - Variable: "$.containerBuildDone"
-                BooleanEquals: True
+                BooleanEquals: true
                 Next: BuildSite
               - Variable: "$.containerBuildDone"
-                BooleanEquals: True
+                BooleanEquals: false
                 Next: WaitForDockerBuild
           BuildSite:
             Type: Task

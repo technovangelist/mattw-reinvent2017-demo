@@ -1,0 +1,717 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket"
+    },
+    "UploadToS3LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-liveblogger-dev-uploadToS3"
+      }
+    },
+    "StartStepFunctionLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-liveblogger-dev-startStepFunction"
+      }
+    },
+    "WhichSlideLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-liveblogger-dev-whichSlide"
+      }
+    },
+    "IsThisANewSlideLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-liveblogger-dev-isThisANewSlide"
+      }
+    },
+    "PullSlideDataLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-liveblogger-dev-pullSlideData"
+      }
+    },
+    "CreateDocumentLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mattw-reinvent2017-liveblogger-dev-createDocument"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "dev",
+                  "mattw-reinvent2017-liveblogger",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-uploadToS3:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-startStepFunction:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-whichSlide:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-isThisANewSlide:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-pullSlideData:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-createDocument:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-uploadToS3:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-startStepFunction:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-whichSlide:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-isThisANewSlide:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-pullSlideData:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mattw-reinvent2017-liveblogger-dev-createDocument:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:*"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::mattw-reinvent17-liveblogger-src/*",
+                    "arn:aws:s3:::mattw-reinvent2017-rawsitepages/*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:StartExecution"
+                  ],
+                  "Resource": [
+                    {
+                      "Ref": "LiveBloggerStateMachine"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem"
+                  ],
+                  "Resource": [
+                    "arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/liveblogger"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "mattw-reinvent2017-liveblogger",
+              "dev",
+              "us-east-1",
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "UploadToS3LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-liveblogger/dev/1511837382959-2017-11-28T02:49:42.959Z/mattw-reinvent2017-liveblogger.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-liveblogger-dev-uploadToS3",
+        "Handler": "handler.uploadToS3",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "s3srcbucket": "mattw-reinvent17-liveblogger-src"
+          }
+        }
+      },
+      "DependsOn": [
+        "UploadToS3LogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "UploadToS3LambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "UploadToS3LambdaFunction"
+        },
+        "CodeSha256": "Pw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68="
+      }
+    },
+    "StartStepFunctionLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-liveblogger/dev/1511837382959-2017-11-28T02:49:42.959Z/mattw-reinvent2017-liveblogger.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-liveblogger-dev-startStepFunction",
+        "Handler": "handler.startStepFunction",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "statemachine_arn": {
+              "Ref": "LiveBloggerStateMachine"
+            }
+          }
+        }
+      },
+      "DependsOn": [
+        "StartStepFunctionLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "StartStepFunctionLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "StartStepFunctionLambdaFunction"
+        },
+        "CodeSha256": "Pw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68="
+      }
+    },
+    "WhichSlideLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-liveblogger/dev/1511837382959-2017-11-28T02:49:42.959Z/mattw-reinvent2017-liveblogger.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-liveblogger-dev-whichSlide",
+        "Handler": "handler.whichSlide",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "WhichSlideLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "WhichSlideLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "WhichSlideLambdaFunction"
+        },
+        "CodeSha256": "Pw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68="
+      }
+    },
+    "IsThisANewSlideLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-liveblogger/dev/1511837382959-2017-11-28T02:49:42.959Z/mattw-reinvent2017-liveblogger.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-liveblogger-dev-isThisANewSlide",
+        "Handler": "handler.isThisANewSlide",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "IsThisANewSlideLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "IsThisANewSlideLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "IsThisANewSlideLambdaFunction"
+        },
+        "CodeSha256": "Pw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68="
+      }
+    },
+    "PullSlideDataLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-liveblogger/dev/1511837382959-2017-11-28T02:49:42.959Z/mattw-reinvent2017-liveblogger.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-liveblogger-dev-pullSlideData",
+        "Handler": "handler.pullSlideData",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "PullSlideDataLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "PullSlideDataLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "PullSlideDataLambdaFunction"
+        },
+        "CodeSha256": "Pw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68="
+      }
+    },
+    "CreateDocumentLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mattw-reinvent2017-liveblogger/dev/1511837382959-2017-11-28T02:49:42.959Z/mattw-reinvent2017-liveblogger.zip"
+        },
+        "FunctionName": "mattw-reinvent2017-liveblogger-dev-createDocument",
+        "Handler": "handler.createDocument",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs6.10",
+        "Timeout": 6
+      },
+      "DependsOn": [
+        "CreateDocumentLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "CreateDocumentLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CreateDocumentLambdaFunction"
+        },
+        "CodeSha256": "Pw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68="
+      }
+    },
+    "IamRoleStateMachineExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "states.us-east-1.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "dev-us-east-1-mattw-reinvent2017-liveblogger-statemachine",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "LiveBloggerStateMachine": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "DefinitionString": "{\"StartAt\":\"whichSlide\",\"States\":{\"whichSlide\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-liveblogger-dev-whichSlide\",\"Next\":\"isThisANewSlide\"},\"isThisANewSlide\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-liveblogger-dev-isThisANewSlide\",\"Next\":\"updateSiteOrNot\"},\"updateSiteOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.updateSite\",\"BooleanEquals\":true,\"Next\":\"pullSlideData\"},{\"Variable\":\"$.updateSite\",\"BooleanEquals\":false,\"Next\":\"completeSF\"}]},\"pullSlideData\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-liveblogger-dev-pullSlideData\",\"Next\":\"createDocument\"},\"createDocument\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-liveblogger-dev-createDocument\",\"Next\":\"buildSite\"},\"buildSite\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-buildSite\",\"Next\":\"waitForBuild\"},\"waitForBuild\":{\"Type\":\"Wait\",\"Seconds\":10,\"Next\":\"isItBuilt\"},\"isItBuilt\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-isItBuilt\",\"Next\":\"builtOrNot\"},\"builtOrNot\":{\"Type\":\"Choice\",\"Choices\":[{\"Variable\":\"$.buildDone\",\"BooleanEquals\":true,\"Next\":\"completeSF\"},{\"Variable\":\"$.buildDone\",\"BooleanEquals\":false,\"Next\":\"waitForBuild\"}]},\"completeSF\":{\"Type\":\"Task\",\"Resource\":\"arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-done\",\"End\":true}}}",
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "IamRoleStateMachineExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": "IamRoleStateMachineExecution"
+    },
+    "S3BucketMattwreinvent17livebloggersrc": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "mattw-reinvent17-liveblogger-src",
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Event": "s3:ObjectCreated:*",
+              "Function": {
+                "Fn::GetAtt": [
+                  "StartStepFunctionLambdaFunction",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "DependsOn": [
+        "StartStepFunctionLambdaPermissionMattwreinvent17livebloggersrcS3"
+      ]
+    },
+    "StartStepFunctionLambdaPermissionMattwreinvent17livebloggersrcS3": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "StartStepFunctionLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "s3.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:s3:::mattw-reinvent17-liveblogger-src"
+            ]
+          ]
+        }
+      }
+    },
+    "ApiGatewayRestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "dev-mattw-reinvent2017-liveblogger"
+      }
+    },
+    "ApiGatewayResourceUpload": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "upload",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodUploadOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Credentials": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,PUT'",
+                "method.response.header.Access-Control-Allow-Credentials": "'false'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceUpload"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodUploadPut": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "PUT",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceUpload"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "UploadToS3LambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayDeployment1511837383009": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "StageName": "dev"
+      },
+      "DependsOn": [
+        "ApiGatewayMethodUploadPut"
+      ]
+    },
+    "UploadToS3LambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "UploadToS3LambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      }
+    },
+    "UploadToS3LambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "UploadToS3LambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68"
+      }
+    },
+    "StartStepFunctionLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "StartStepFunctionLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68"
+      }
+    },
+    "WhichSlideLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "WhichSlideLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68"
+      }
+    },
+    "IsThisANewSlideLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "IsThisANewSlideLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68"
+      }
+    },
+    "PullSlideDataLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "PullSlideDataLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68"
+      }
+    },
+    "CreateDocumentLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "CreateDocumentLambdaVersionPw3L7nQYz6Kn2lW4GbqQVlIZcScWgZmfNa6YkvUDo68"
+      }
+    },
+    "LiveBloggerStateMachineArn": {
+      "Description": "Current StateMachine Arn",
+      "Value": {
+        "Ref": "LiveBloggerStateMachine"
+      }
+    },
+    "ServiceEndpoint": {
+      "Description": "URL of the service endpoint",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "ApiGatewayRestApi"
+            },
+            ".execute-api.us-east-1.amazonaws.com/dev"
+          ]
+        ]
+      }
+    },
+    "LiveBloggerStateMachine": {
+      "Description": "The ARN of the example state machine",
+      "Value": {
+        "Ref": "LiveBloggerStateMachine"
+      }
+    }
+  }
+}
