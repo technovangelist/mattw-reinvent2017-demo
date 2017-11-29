@@ -4,7 +4,7 @@ const aws = require("aws-sdk");
 const fileType = require("file-type");
 const unirest = require("unirest");
 const git = require("simple-git");
-const execute = require('lambduh-execute');
+const execute = require("lambduh-execute");
 
 // const fs = require("nano-fs");
 // const rp = require("request-promise-native");
@@ -66,22 +66,24 @@ module.exports.whichSlide = async (event, context, callback) => {
     event.filename;
   try {
     unirest
-      .post("http://cl-api.vize.ai/3683")
-      .attach({
-        image: s3imagefile
-      })
+      // .post("http://cl-api.vize.ai/3683")
+      .post("http://cl-api.vize.ai/3796")
+      .attach({ image: s3imagefile })
       .header(
         "Authorization",
-        "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjMzNDMsImlhdCI6MTUxMTQ4NjE3NywiZXhwIjoxNTE5MjYyMTc3fQ.FBVj5P29Wy7HQA6QgUSSV0ew5XbwcQiMb6SC3C8zXJk"
+        "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjMzNDMsImlhdCI6MTUxMTkwNDk1MywiZXhwIjoxNTE5NjgwOTUzfQ.gbVg20sPP9wdWRDXlJf0sR0BwjMDwwCO_mxLqenAdLk"
       )
       .header("Accept", "application/json")
       .end(function(result) {
         vizeout = result.body;
+        let assurance = vizeout.scores[vizeout.prediction];
+        console.log(assurance);
         callback(null, {
           message: `Slide ${vizeout.prediction}`,
           image: s3imagefile,
           scores: vizeout.scores,
-          prediction: vizeout.prediction
+          prediction: vizeout.prediction,
+          assurance: assurance
         });
       });
   } catch (error) {
@@ -91,77 +93,115 @@ module.exports.whichSlide = async (event, context, callback) => {
 
 module.exports.isThisANewSlide = async (event, context, callback) => {
   // update this to point to real current slide
-  const currentSlide = 2;
-  const prediction = parseInt(event.prediction);
-  let isNewSlide = false;
-  if (
-    parseInt(prediction) >= currentSlide - 3 &&
-    parseInt(prediction) <= currentSlide + 3 &&
-    parseInt(prediction) != currentSlide
-  ) {
-    isNewSlide = true;
+  const dynamo = new aws.DynamoDB();
+  try {
+    let isNewSlide = false;
+    const lastslide = await dynamo
+      .getItem({
+        Key: { current: { S: "current" } },
+        TableName: "livebloggercurrent"
+      })
+      .promise();
+    const prediction = parseInt(event.prediction);
+    if (lastslide.Item.slide.N != prediction && event.assurance > 0.7) {
+      console.log("different slide");
+      isNewSlide = true;
+
+      const params = { Item: { current: { S: "current" }, slide: { N: prediction.toString() } }, TableName: "livebloggercurrent" };
+      dynamo.putItem(params, (err, data) => {
+        if (err) console.log(`problem setting current slide in dynamo: ${err}`);
+        else console.log(`Set current slide in dynamo to ${prediction}`);
+
+      })
+    }
+
+    callback(null, {
+      message: `Site should ${isNewSlide ? " " : "not "}be updated`,
+      updateSite: isNewSlide,
+      image: event.image,
+      slide: event.prediction,
+      assurance: event.assurance
+    });
+  } catch (err) {
+    callback(err);
   }
-  callback(null, {
-    message: `Site should ${isNewSlide ? " " : "not "}be updated`,
-    updateSite: isNewSlide, 
-    image: event.image, 
-    slide: event.prediction
-  });
 };
 
+
+
 module.exports.pullSlideData = async (event, context, callback) => {
-  const dynamo = new aws.DynamoDB();
-  const params = {
-    Key: {
-      "slideid": {
-        N: event.slide
+  if (event.updateSite) {
+    const dynamo = new aws.DynamoDB();
+    const params = {
+      Key: {
+        slideid: {
+          N: event.slide
+        }
+      },
+      TableName: "liveblogger"
+    };
+
+    dynamo.getItem(params, (err, data) => {
+      if (err) console.log(err);
+      else {
+        console.log(data);
+        if (!isEmpty(data)) {
+          callback(null, {
+            message: `Got text for slide ${event.slide}`,
+            image: event.image,
+            text: data.Item.text.S,
+            slide: event.slide,
+            assurance: event.assurance, 
+            updateSite: true
+          });
+        } else {
+          callback(null, {message: 'no slide data in dynamo', updateSite: false})
+        }
       }
-    }, 
-    TableName: "liveblogger"
-  };
-
-  dynamo.getItem(params, (err, data) => {
-    if (err) console.log(err);
-    else {
-      console.log(data.Item.text.S);
-      callback(null, {message: `Got text for slide ${event.slide}`, image: event.image, text: data.Item.text.S, slide: event.slide});
-    }
-  })
-
+    });
+  } else {
+  callback(null, {message: 'skipping', updateSite: false})
+  }
 };
 
 module.exports.createDocument = async (event, context, callback) => {
-  let { DateTime } = require('luxon');
+  let { DateTime } = require("luxon");
   const dynamo = new aws.DynamoDB();
+  const assurance = parseFloat(event.assurance) * 100;
   const params = {
     Key: {
-      "slideid": {
+      slideid: {
         N: event.slide
       }
-    }, 
+    },
     TableName: "liveblogger"
   };
   dynamo.getItem(params, (err, data) => {
     if (err) console.log(err);
     else {
-
-      let slidepost = `---\ndate: ${DateTime.local().toISO()}\ntitle: Slide ${event.slide} Live Blog\ntype: liveblog\n---\n![Slide Image](${event.image})<br>${data.Item.text.S}`;
+      let slidepost = `---\ndate: ${DateTime.local()
+        .setZone("America/Los_Angeles")
+        .toISO()}\ntitle: Slide ${
+        event.slide
+      } Live Blog\ntype: liveblog\n---\nVize.ai says there is a ${assurance.toString()}% chance this is Slide ${
+        event.slide
+      }\n![Slide Image](${event.image})<br>${data.Item.text.S}`;
       console.log(slidepost);
       const buffer = new Buffer(slidepost);
       const params = {
-        Body: buffer, 
-        Bucket: "mattw-reinvent2017-rawsitepages", 
-        Key: `${DateTime.local().toFormat("LL-dd-yy-T")}/index.md`
-      }
+        Body: buffer,
+        Bucket: "mattw-reinvent2017-rawsitepages",
+        Key: `${DateTime.local()
+          .setZone("America/Los_Angeles")
+          .toFormat("LL-dd-yy-T")}-slide${event.slide}-liveblog/index.md`
+      };
       const s3 = new aws.S3();
-      s3.putObject(params, (err, data)=>{
+      s3.putObject(params, (err, data) => {
         if (err) callback(err);
-        else callback(null, {message: "it worked"});
-
+        else callback(null, { message: "it worked" });
       });
-
     }
-  })
+  });
 };
 
 module.exports.completeSF = async (event, context, callback) => {};
@@ -194,3 +234,10 @@ const timeStamp = () => {
   return `${now.getMonth() +
     1}/${now.getDate()}/${now.getFullYear()} - ${now.getHours()}:${now.getMinutes()}`;
 };
+
+function isEmpty(obj) {
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) return false;
+  }
+  return true;
+}
