@@ -111,7 +111,6 @@ stepFunctions:
           createDocument:
             Type: Task
             Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-createDocument
-            # Resource: arn:aws:states:#{AWS::Region}:#{AWS::AccountId}:activity:mattw-reinvent2017-createnewpageactivity
             Next: buildSite
           buildSite:
             Type: Task
@@ -141,11 +140,6 @@ stepFunctions:
           
 
 resources:
-  # Resources:
-  #   S3BucketSrcPhotos:
-  #     Type: AWS::S3::Bucket
-  #     Properties:
-  #       BucketName: mattw-reinvent17-liveblogger-src
   Outputs:
     LiveBloggerStateMachine:
       Description: The ARN of the example state machine

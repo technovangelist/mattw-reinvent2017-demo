@@ -1,0 +1,36 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ImageTransformer	../slideimageprep/image_transformer.py	/^class ImageTransformer(object):$/;"	kind:class	line:28
+ImageTransformer	../slideimageprep/imageprep.py	/^from image_transformer import ImageTransformer$/;"	kind:namespace	line:3
+__init__	../slideimageprep/image_transformer.py	/^    def __init__(self, image_path, shape):$/;"	kind:member	line:32
+cv2	../slideimageprep/image_transformer.py	/^import cv2$/;"	kind:namespace	line:3
+cv2	../slideimageprep/util.py	/^import cv2$/;"	kind:namespace	line:2
+deg_to_rad	../slideimageprep/util.py	/^def deg_to_rad(deg):$/;"	kind:function	line:26
+get_M	../slideimageprep/image_transformer.py	/^    def get_M(self, theta, phi, gamma, dx, dy, dz):$/;"	kind:member	line:60
+get_deg	../slideimageprep/util.py	/^def get_deg(rtheta, rphi, rgamma):$/;"	kind:function	line:21
+get_rad	../slideimageprep/util.py	/^def get_rad(theta, phi, gamma):$/;"	kind:function	line:16
+image_transformer.py	../slideimageprep/image_transformer.py	1;"	kind:file	line:1
+imageprep.py	../slideimageprep/imageprep.py	1;"	kind:file	line:1
+img_path	../slideimageprep/imageprep.py	/^img_path = sys.argv[1]$/;"	kind:variable	line:6
+it	../slideimageprep/imageprep.py	/^it = ImageTransformer(img_path, None)$/;"	kind:variable	line:8
+load_image	../slideimageprep/util.py	/^def load_image(img_path, shape=None):$/;"	kind:function	line:6
+np	../slideimageprep/image_transformer.py	/^import numpy as np$/;"	kind:namespace	line:2
+os	../slideimageprep/imageprep.py	/^import os$/;"	kind:namespace	line:2
+pi	../slideimageprep/util.py	/^from math import pi$/;"	kind:namespace	line:1
+rad_to_deg	../slideimageprep/util.py	/^def rad_to_deg(rad):$/;"	kind:function	line:29
+rotate_along_axis	../slideimageprep/image_transformer.py	/^    def rotate_along_axis(self, theta=0, phi=0, gamma=0, dx=0, dy=0, dz=0):$/;"	kind:member	line:42
+rotated_img	../slideimageprep/imageprep.py	/^rotated_img = it.rotate_along_axis(phi = yang, gamma = zang, theta = xang, dx = xdist, dy = ydist, dz = zdist)$/;"	kind:variable	line:21
+save_image	../slideimageprep/imageprep.py	/^from util import save_image$/;"	kind:namespace	line:4
+save_image	../slideimageprep/util.py	/^def save_image(img_path, img):$/;"	kind:function	line:13
+sys	../slideimageprep/imageprep.py	/^import sys$/;"	kind:namespace	line:1
+util.py	../slideimageprep/util.py	1;"	kind:file	line:1
+xang	../slideimageprep/imageprep.py	/^xang = 10$/;"	kind:variable	line:13
+xdist	../slideimageprep/imageprep.py	/^xdist = 100$/;"	kind:variable	line:17
+yang	../slideimageprep/imageprep.py	/^yang = 10$/;"	kind:variable	line:14
+ydist	../slideimageprep/imageprep.py	/^ydist = 100$/;"	kind:variable	line:18
+zang	../slideimageprep/imageprep.py	/^zang = 8$/;"	kind:variable	line:15
+zdist	../slideimageprep/imageprep.py	/^zdist = 100000$/;"	kind:variable	line:19

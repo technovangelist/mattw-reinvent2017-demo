@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Matthew Williams - matt.williams@datadoghq.com",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.156.0"
