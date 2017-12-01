@@ -35,8 +35,6 @@ module.exports.whatChanged = async (event, context, callback) => {
 };
 
 module.exports.build = async (event, context, callback) => {
-  // console.log(JSON.stringify(event));
-  // const codeCommitEvent = JSON.parse(event.Records[0].Sns.Message);
   const codebuild = new aws.CodeBuild();
   try {
     const cbparams = {

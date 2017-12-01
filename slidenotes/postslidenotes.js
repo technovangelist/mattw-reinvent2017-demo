@@ -11,18 +11,7 @@ const readSource = (slidenum) => {
             })
         }
     })
-    // if (fs.statSync(`./${slidefilename}`)) {
-    //     fs.readFile(slidefilename, (err, data)=> {
-    //         if (err) console.log(`Error opening ${slidefilename}`);
-    //         console.log(data);
-
-    //     })
-    // } else {
-    //     console.log('no such file'+slidefilename);
-    // }
-
 };
-
 
 const pushToDynamo = (slidenum, text) => {
     const params = {
@@ -46,8 +35,6 @@ const pushToDynamo = (slidenum, text) => {
     })
 };
 
-for (let index = 1; index < 42; index++) {
+for (let index = 1; index < 69; index++) {
     readSource(index);
-
-    
 }

@@ -4,8 +4,7 @@ const aws = require("aws-sdk");
 const fileType = require("file-type");
 const unirest = require("unirest");
 const git = require("simple-git");
-const execute = require("lambduh-execute");
-
+const assurancemin = 0.8;
 // const fs = require("nano-fs");
 // const rp = require("request-promise-native");
 // const request = require("request");
@@ -78,6 +77,7 @@ module.exports.whichSlide = async (event, context, callback) => {
         vizeout = result.body;
         let assurance = vizeout.scores[vizeout.prediction];
         console.log(assurance);
+        console.log(`slide ${vizeout.prediction} - ${assurance}`);
         callback(null, {
           message: `Slide ${vizeout.prediction}`,
           image: s3imagefile,
@@ -93,9 +93,10 @@ module.exports.whichSlide = async (event, context, callback) => {
 
 module.exports.isThisANewSlide = async (event, context, callback) => {
   // update this to point to real current slide
+
   const dynamo = new aws.DynamoDB();
   try {
-    let isNewSlide = false;
+    let isNewSlide = true;
     const lastslide = await dynamo
       .getItem({
         Key: { current: { S: "current" } },
@@ -103,16 +104,29 @@ module.exports.isThisANewSlide = async (event, context, callback) => {
       })
       .promise();
     const prediction = parseInt(event.prediction);
-    if (lastslide.Item.slide.N != prediction && event.assurance > 0.7) {
-      console.log("different slide");
+    const assured = event.assurance > assurancemin;
+    const knownsameslide = lastslide.Item.slide.N == prediction && assured;
+    const knowndifferentslide = lastslide.Item.slide.N != prediction && assured;
+
+    if (knowndifferentslide) {
+      console.log("I recognize that this slid is different");
       isNewSlide = true;
 
-      const params = { Item: { current: { S: "current" }, slide: { N: prediction.toString() } }, TableName: "livebloggercurrent" };
+      const params = {
+        Item: {
+          current: { S: "current" },
+          slide: { N: prediction.toString() }
+        },
+        TableName: "livebloggercurrent"
+      };
       dynamo.putItem(params, (err, data) => {
         if (err) console.log(`problem setting current slide in dynamo: ${err}`);
         else console.log(`Set current slide in dynamo to ${prediction}`);
+      });
+    }
 
-      })
+    if (knownsameslide) {
+      isNewSlide = false;
     }
 
     callback(null, {
@@ -126,8 +140,6 @@ module.exports.isThisANewSlide = async (event, context, callback) => {
     callback(err);
   }
 };
-
-
 
 module.exports.pullSlideData = async (event, context, callback) => {
   if (event.updateSite) {
@@ -151,60 +163,106 @@ module.exports.pullSlideData = async (event, context, callback) => {
             image: event.image,
             text: data.Item.text.S,
             slide: event.slide,
-            assurance: event.assurance, 
+            assurance: event.assurance,
             updateSite: true
           });
         } else {
-          callback(null, {message: 'no slide data in dynamo', updateSite: false})
+          callback(null, {
+            message: "no slide data in dynamo",
+            updateSite: true,
+            text: "",
+            slide: event.slide,
+            assurance: event.assurance,
+            image: event.image
+          });
         }
       }
     });
   } else {
-  callback(null, {message: 'skipping', updateSite: false})
+    callback(null, { message: "skipping", updateSite: false });
   }
 };
 
 module.exports.createDocument = async (event, context, callback) => {
   let { DateTime } = require("luxon");
   const dynamo = new aws.DynamoDB();
-  const assurance = parseFloat(event.assurance) * 100;
+  let vizechance = "";
+  let assured = false;
+  if (parseFloat(event.assurance) > assurancemin) {
+    assured = true;
+    vizechance = `*Vize.ai says there is a ${(
+      parseFloat(event.assurance) * 100
+    ).toString()}% chance this is Slide ${event.slide}*`;
+  }
+  const postDate = DateTime.local()
+    .setZone("America/Los_Angeles")
+    .toISO();
+  const postTitle = assured
+    ? `Slide ${event.slide} Live Blog`
+    : "Live Blog Update";
+
+  let slidepost = `---\ndate: ${postDate}\ntitle: ${postTitle}\ntype: liveblog\n---\n![Slide Image](${event.image})<br>${event.text}<br>${vizechance}`;
+  console.log(slidepost);
+  const buffer = new Buffer(slidepost);
   const params = {
-    Key: {
-      slideid: {
-        N: event.slide
-      }
-    },
-    TableName: "liveblogger"
+    Body: buffer,
+    Bucket: "mattw-reinvent2017-rawsitepages",
+    Key: `${DateTime.local()
+      .setZone("America/Los_Angeles")
+      .toFormat("LL-dd-yy-T")}-slide${event.slide}-liveblog/index.md`
   };
-  dynamo.getItem(params, (err, data) => {
-    if (err) console.log(err);
-    else {
-      let slidepost = `---\ndate: ${DateTime.local()
-        .setZone("America/Los_Angeles")
-        .toISO()}\ntitle: Slide ${
-        event.slide
-      } Live Blog\ntype: liveblog\n---\nVize.ai says there is a ${assurance.toString()}% chance this is Slide ${
-        event.slide
-      }\n![Slide Image](${event.image})<br>${data.Item.text.S}`;
-      console.log(slidepost);
-      const buffer = new Buffer(slidepost);
-      const params = {
-        Body: buffer,
-        Bucket: "mattw-reinvent2017-rawsitepages",
-        Key: `${DateTime.local()
-          .setZone("America/Los_Angeles")
-          .toFormat("LL-dd-yy-T")}-slide${event.slide}-liveblog/index.md`
-      };
-      const s3 = new aws.S3();
-      s3.putObject(params, (err, data) => {
-        if (err) callback(err);
-        else callback(null, { message: "it worked" });
-      });
-    }
+  const s3 = new aws.S3();
+  s3.putObject(params, (err, data) => {
+    if (err) callback(err);
+    else callback(null, { message: "it worked", updateSite: event.updateSite });
   });
 };
 
-module.exports.completeSF = async (event, context, callback) => {};
+module.exports.buildSite = async (event, context, callback) => {
+  const codebuild = new aws.CodeBuild();
+  try {
+    const cbparams = {
+      projectName: "buildfromdocker",
+      sourceVersion: event.commitId
+    };
+
+    const buildInfo = await codebuild.startBuild(cbparams).promise();
+    notify(`Website publish started: ${timeStamp()}`);
+    callback(null, {
+      message: "build maybe worked",
+      buildId: buildInfo.build.id, 
+      updateSite: event.updateSite
+    });
+  } catch (err) {
+    callback(err.message);
+  }
+};
+
+module.exports.isItBuilt = async (event, context, callback) => {
+  const cb = new aws.CodeBuild();
+  try {
+    const params = { ids: [event.buildId] };
+
+    const buildInfo = await cb.batchGetBuilds(params).promise();
+    const buildDone = buildInfo.builds[0].buildComplete;
+    callback(null, {
+      message: "verified built",
+      buildId: event.buildId,
+      buildDone: buildDone, 
+      updateSite: event.updateSite
+    });
+  } catch (err) {
+    callback(err.message);
+  }
+};
+
+
+module.exports.completeSF = async (event, context, callback) => {
+  console.log(event.updateSite);
+  if (event.updateSite == true) {
+    notify(`Website successfully published: ${timeStamp()}`);
+  }
+};
 
 const getFile = (fileMime, buffer) => {
   const fileExt = fileMime.ext;
@@ -241,3 +299,15 @@ function isEmpty(obj) {
   }
   return true;
 }
+
+const notify = message => {
+  const sms = new aws.SNS();
+  const params = {
+    Message: message,
+    TopicArn: "arn:aws:sns:us-east-1:172597598159:mattw-notify-siteBuild"
+  };
+  sms.publish(params, (err, data) => {
+    if (err) console.log(err.message);
+    else console.log(data);
+  });
+};

@@ -61,3 +61,5 @@ slideimageprep/bg/*.jpg
 slideimageprep/interim/
 slideimageprep/output/
 slideimageprep/srcslides/
+
+.serverless/

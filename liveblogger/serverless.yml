@@ -34,6 +34,17 @@ provider:
         - "dynamodb:PutItem"
       Resource:
         - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/livebloggercurrent
+    - Effect: "Allow"
+      Action:
+        - "codebuild:StartBuild"
+        - "codebuild:BatchGetBuilds"
+      Resource:
+        - arn:aws:codebuild:#{AWS::Region}:#{AWS::AccountId}:project/buildfromdocker
+    - Effect: "Allow"
+      Action:
+        - "SNS:Publish"
+      Resource:
+        - arn:aws:sns:#{AWS::Region}:#{AWS::AccountId}:mattw-notify-siteBuild
 functions:
   uploadToS3:
     handler: handler.uploadToS3
@@ -79,6 +90,21 @@ functions:
     tags: 
       demo: liveblogger
       demorole: createDocument
+  buildSite:
+    handler: handler.buildSite
+    tags: 
+      demo: liveblogger
+      demorole: buildSite
+  isItBuilt:
+    handler: handler.isItBuilt
+    tags: 
+      demo: liveblogger
+      demorole: isItBuilt
+  completeSF:
+    handler: handler.completeSF
+    tags: 
+      demo: liveblogger
+      demorole: completeSF
 
 stepFunctions:
   stateMachines:
@@ -114,7 +140,7 @@ stepFunctions:
             Next: buildSite
           buildSite:
             Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-buildSite
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-buildSite
             Next: waitForBuild
           waitForBuild:
             Type: Wait
@@ -122,7 +148,7 @@ stepFunctions:
             Next: isItBuilt
           isItBuilt:
             Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-isItBuilt
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-isItBuilt
             Next: builtOrNot
           builtOrNot:
             Type: Choice
@@ -135,7 +161,7 @@ stepFunctions:
                 Next: waitForBuild
           completeSF:
             Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:mattw-reinvent2017-build-website-dev-done
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-completeSF
             End: true
           
 

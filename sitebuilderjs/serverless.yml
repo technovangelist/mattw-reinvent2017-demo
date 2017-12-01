@@ -62,8 +62,12 @@ stepFunctions:
     FirstStateMachine:
       name: myStateMachine
       definition:
-        StartAt: WhatChanged
+        StartAt: WaitaSecond
         States:
+          WaitaSecond:
+            Type: Wait
+            Seconds: 3
+            Next: WhatChanged
           WhatChanged:
             Type: Task
             Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-whatChanged
