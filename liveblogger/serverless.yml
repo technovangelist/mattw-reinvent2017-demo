@@ -72,6 +72,8 @@ functions:
       statemachine_arn: ${self:resources.Outputs.LiveBloggerStateMachine.Value}
   whichSlide:
     handler: handler.whichSlide
+    environment:
+      vizeaijwt: ${env:vizejwtfinalslides}
     tags: 
       demo: liveblogger
       demorole: whichSlide

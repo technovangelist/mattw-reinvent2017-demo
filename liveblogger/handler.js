@@ -70,7 +70,7 @@ module.exports.whichSlide = async (event, context, callback) => {
       .attach({ image: s3imagefile })
       .header(
         "Authorization",
-        "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjMzNDMsImlhdCI6MTUxMTkwNDk1MywiZXhwIjoxNTE5NjgwOTUzfQ.gbVg20sPP9wdWRDXlJf0sR0BwjMDwwCO_mxLqenAdLk"
+        process.env.vizeaijwt
       )
       .header("Accept", "application/json")
       .end(function(result) {
