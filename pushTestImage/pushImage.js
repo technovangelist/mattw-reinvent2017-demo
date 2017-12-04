@@ -19,22 +19,6 @@ const pushToS3 = () => {
 
         })
     })
-    // const requestEpoch = event.requestContext.requestTimeEpoch;
-    // const buffer = new Buffer(event.body, "base64");
-    // const fileMime = fileType(buffer);
-    // const file = getFile(fileMime, buffer);
-    // file.params.Key = `${requestEpoch}.jpg`;
-    // file.params.ACL = "public-read";
-    // const objectInfo = await s3.putObject(file.params).promise();
-
-    // let response = {
-    //     statusCode: 200,
-    //     body: JSON.stringify({
-    //     message: "uploaded image to s3",
-    //     etag: objectInfo.ETag
-    //     })
-    // };
-
 };
 
 pushToS3();
